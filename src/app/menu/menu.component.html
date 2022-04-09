@@ -1,0 +1,7 @@
+<div class="content__menu">
+  <div *ngFor="let coin of coinsInfo"  class="coin" (click)="selected($event)">
+    <div class="name" id="{{coin.id}}">{{coin.name}}</div>
+    <img id="{{coin.id}}" src="{{coin.image.large}}">
+  </div>
+</div>
+
