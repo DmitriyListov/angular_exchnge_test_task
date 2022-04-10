@@ -1,21 +1,22 @@
 import {ChangeDetectorRef, Component, DoCheck, OnChanges, OnInit} from '@angular/core';
 import {CoinInfo, CoinRate, CurrentCoinInfo, RequestState} from "./types/type";
-import {HttpClient} from '@angular/common/http';
-import {of} from "rxjs";
 import {HttpServiceComponent} from './servises/http-service/http-service.component';
+import {CreateCSVComponent} from "./servises/create-csv/create-csv.component";
+import {SortCoinsComponent} from "./sort-coins/sort-coins.component";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  providers: [HttpServiceComponent],
+  providers: [HttpServiceComponent, CreateCSVComponent, SortCoinsComponent],
 })
-
 export class AppComponent implements OnInit, OnChanges, DoCheck {
-  private _httpClient: HttpClient;
 
-  constructor(private httpClient: HttpClient, private httpService: HttpServiceComponent, private cdr: ChangeDetectorRef) {
-    this._httpClient = httpClient;
+  constructor(
+    private httpService: HttpServiceComponent,
+    private cdr: ChangeDetectorRef,
+    private CSV: CreateCSVComponent,
+    private sortComponent: SortCoinsComponent) {
   };
 
 
@@ -25,13 +26,10 @@ export class AppComponent implements OnInit, OnChanges, DoCheck {
   errorState: RequestState = {};
   loading: boolean = true;
 
-
   async ngOnInit(): Promise<void> {
-
+    this.loadCoinsInfo();
     this.loadCurrentRate('bitcoin');
-    await this.loadCoinsInfo();
-    this.getTableHeaderInfo('bitcoin')
-
+    this.getTableHeaderInfo('bitcoin');
   }
 
   getTableHeaderInfo(id: string): void {
@@ -45,60 +43,62 @@ export class AppComponent implements OnInit, OnChanges, DoCheck {
     }
   };
 
-  async loadCoinsInfo(): Promise<void> {
-    return new Promise(resolve => {
-      of(this.httpService.getCoinsInfo()).subscribe({
-
-        next: (data) => {
-          data.subscribe(
-            value => {
-              resolve();
-              return [...this.coinsInfo] = [...value];
-            })
-        },
-
-        error: (err) => {
-          this.errorState.state = !err.ok
-          this.errorState.message = err.message
-        },
-
-        complete: () => {
-          this.loading = false;
-        }
-      });
-    });
+  loadCoinsInfo(): void {
+    this.httpService.getCoinsInfo().subscribe({
+      next: ((data) => {
+        [...this.coinsInfo] = [...data];
+      }),
+      error: (err) => {
+        this.errorState.state = !err.ok;
+        this.errorState.message = err.message
+      },
+      complete: () => {
+        this.loading = false;
+        this.getTableHeaderInfo('bitcoin')
+      }
+    })
   };
 
-  loadCurrentRate(id: string) {
-    of(this.httpService.getCoinsRate(id)).subscribe({
-      next: (data) => data.subscribe(value => [...this.coinRate] = [...value],),
+  loadCurrentRate(id: string): void {
+    this.loading = true;
+    this.httpService.getCoinsRate(id).subscribe({
+      next: (data => {
+        [...this.coinRate] = [...data];
+      }),
       error: (err) => {
-        this.errorState.state = !err.ok
+        this.errorState.state = !err.ok;
         this.errorState.message = err.message
       },
       complete: () => {
         this.loading = false;
       }
-    });
-  };
+    })
+  } ;
 
   ngOnChanges() {
-
-  };
+  } ;
 
   ngDoCheck() {
 
-  };
+  } ;
 
-  public async getIdCoin(id: string): Promise<void> {
-    this.loadCurrentRate(id);
+  public  getIdCoin(id: string): void {
+    this.loadCurrentRate(id)
     this.getTableHeaderInfo(id);
   }
 
   toggle: boolean = false;
 
+  sort(sortedType: string): void {
+    [...this.coinRate] = [...this.sortComponent.sort(sortedType, this.coinRate)]
+  }
+
   showMenu(): void {
     this.toggle = !this.toggle
+  }
+
+  downloadCSV(): void {
+    this.CSV.exportTableToCSV();
   }
 }
 

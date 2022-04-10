@@ -1,8 +1,9 @@
 <div class="app-container" ng-controller="renderCoinsList">
   <header>
     <div class="menu-btn" (click)="showMenu()">Select coin</div>
-    <app-sort-coins [coinRate]="coinRate"></app-sort-coins>
-    <app-create-csv></app-create-csv>
+    <div class="menu-btn" (click)="sort('date')">Sort by date</div>
+    <div class="menu-btn" (click)="sort('rate')">Sort by rate</div>
+    <div class="menu-btn" (click)="downloadCSV()">Create CSV</div>
   </header>
 
   <main class="content">
@@ -12,7 +13,6 @@
       [ngStyle]="{transform: toggle ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform .5s ease-out'}">
     </app-menu>
     <div class="table">
-
       <div class="loader">
         <div class="lds-ripple" *ngIf="loading">
           <div></div>
@@ -39,7 +39,7 @@
         </ul>
       </div>
     </div>
-    <app-graphic [coinRate]="coinRate" ></app-graphic>
+    <app-graphic [coinRate]="coinRate"></app-graphic>
 
   </main>
 
@@ -47,7 +47,7 @@
     <div class="bg"></div>
     <div class="message">
       <span>Sorry, something went wrong, please try again later</span>
-     <span>{{errorState.message}}</span>
+      <span>{{errorState.message}}</span>
     </div>
   </div>
 </div>

@@ -13,9 +13,6 @@ export class MenuComponent {
 
   selected({target}: Event) {
     const id: string = (target as HTMLElement).id
-    console.log(target);
     this.newItemEvent.emit(id);
-    console.log(1231231)
   }
-
 }

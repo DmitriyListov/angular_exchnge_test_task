@@ -13,8 +13,6 @@ import {
   curveCatmullRom
 } from "d3";
 
-import {coinsTestObj} from "../servises/offlineData";
-
 interface Margin {
   top: number,
   right: number,
@@ -86,11 +84,13 @@ export class GraphicComponent implements OnInit, OnChanges, DoCheck {
         return formatTime(<Date>d);
       })
 
-
     const yScale = scaleLinear()
       .domain([minRate, maxRate])
       .range([this.innerHeight, 0])
       .nice()
+
+    const yAxis = axisLeft(yScale)
+
 
     const createLine = line()
       .context(null)
@@ -101,6 +101,7 @@ export class GraphicComponent implements OnInit, OnChanges, DoCheck {
     const lineData = coinsRateData.map((item) => {
       return [item.date, item.rate]
     });
+
     this.svg.append('path')
       .attr('stroke', 'green')
       .attr('stroke-width', '2')
@@ -111,9 +112,9 @@ export class GraphicComponent implements OnInit, OnChanges, DoCheck {
       .attr('transform', `translate(${this.margin.left}, 0)`);
 
     this.svg.append('g')
-      .attr('class', 'y-axis')
       .attr('transform', `translate(${this.margin.left},0)`)
-      .call(axisLeft(yScale))
+      .call(yAxis)
+
 
     this.svg.append('g')
       .attr('transform', `translate(${this.margin.left},${this.height - this.margin.top})`)
@@ -133,8 +134,7 @@ export class GraphicComponent implements OnInit, OnChanges, DoCheck {
       .attr('transform', `translate(${this.margin.left},0)`)
       .attr("r", 4)
       .style("opacity", .9)
-      .style("fill", "#495fff")
-
+      .style("fill", "#495fff");
   }
 
   flag: boolean = false;
@@ -145,9 +145,8 @@ export class GraphicComponent implements OnInit, OnChanges, DoCheck {
 
   ngDoCheck() {
     select('svg').remove();
-    this.createSVG()
+    this.createSVG();
     if (!this.coinRate.length) {
-      this.draw(coinsTestObj);
       return
     }
     this.draw(this.coinRate);

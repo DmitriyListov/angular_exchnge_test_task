@@ -1,23 +1,16 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnInit} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {CoinRate} from "../types/type";
 
-@Component({
-  selector: 'app-sort-coins',
-  templateUrl: './sort-coins.component.html',
-  styleUrls: ['./sort-coins.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
-})
+@Injectable()
 export class SortCoinsComponent {
   constructor() {
   }
 
-  @Input() coinRate: CoinRate[] = [];
-
   directionDate: boolean = false;
 
-  sortByDate(): void {
+  sortByDate(arrayRates: CoinRate[]): CoinRate[] {
     this.directionDate = !this.directionDate;
-    this.coinRate.sort((a: CoinRate, b: CoinRate): number => {
+    return arrayRates.sort((a: CoinRate, b: CoinRate): number => {
       if (this.directionDate) {
         return (b.date as number) - (a.date as number)
       } else {
@@ -28,9 +21,9 @@ export class SortCoinsComponent {
 
   directionRate: boolean = false;
 
-  sortByRate(): void {
+  sortByRate(arrayRates: CoinRate[]): CoinRate[] {
     this.directionRate = !this.directionRate;
-    this.coinRate.sort((a: CoinRate, b: CoinRate): number => {
+    return arrayRates.sort((a: CoinRate, b: CoinRate): number => {
       if (this.directionRate) {
         return (b.rate as number) - (a.rate as number)
       } else {
@@ -39,9 +32,7 @@ export class SortCoinsComponent {
     });
   };
 
-  sort(event: Event): void {
-    const paramName = (event.target as HTMLElement).id;
-    paramName === 'date' ? this.sortByDate() : this.sortByRate()
+  sort(sortedType: string, arrayRates: CoinRate[]): CoinRate[] {
+    return sortedType === 'date' ? this.sortByDate(arrayRates) : this.sortByRate(arrayRates)
   }
-
 }

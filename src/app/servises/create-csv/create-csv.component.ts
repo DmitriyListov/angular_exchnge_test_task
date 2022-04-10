@@ -1,18 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Injectable} from '@angular/core';
 
-@Component({
-  selector: 'app-create-csv',
-  templateUrl: './create-csv.component.html',
-  styleUrls: ['./create-csv.component.scss']
-})
-export class CreateCSVComponent implements OnInit {
+@Injectable()
+export class CreateCSVComponent {
 
-  constructor() { }
-
-  ngOnInit(): void {
-
-  }
-  exportTableToCSV  () :void {
+  exportTableToCSV(): void {
     let csv = [];
     const rows = document.querySelectorAll(".list");
 
@@ -25,13 +16,13 @@ export class CreateCSVComponent implements OnInit {
       csv.push(row.join("\t"));
 
     }
-    ;
+
     this.downloadCSV(csv.join("\n"));
     console.log('csv: ', csv);
 
   }
 
-  downloadCSV  (csv: any):void {
+  downloadCSV(csv: any): void {
 
     const csvFile = new Blob([csv], {type: "text/csv"});
 
@@ -48,14 +39,4 @@ export class CreateCSVComponent implements OnInit {
     downloadLink.click();
     downloadLink.remove()
   }
-// document.querySelector('button').addEventListener('click', () => exportTableToCSV('coins'));
-
-
-
-
-
-
-
-
-
 }
